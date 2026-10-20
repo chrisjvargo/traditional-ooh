@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traditional Media I — Out-of-Home + Digital OOH | APRD 3002</title>
+<style>
+  :root{
+    --ink:#141414; --paper:#ffffff; --blue:#1246a0; --amber:#f5b301;
+    --grey:#5a5a5a; --line:#d9d9d9; --soft:#f2f2f0; --red:#b3271e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--paper); overflow:hidden;
+  }
+  .deck{position:relative;height:100vh;width:100vw}
+  .slide{
+    position:absolute; inset:0; display:none; flex-direction:column;
+    padding:4.5vh 6vw 7vh 6vw; overflow-y:auto;
+  }
+  .slide.active{display:flex}
+  .kicker{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--blue); margin-bottom:14px;
+  }
+  h1{font-family:Georgia,"Times New Roman",serif; font-weight:700; font-size:clamp(34px,4.6vw,58px); line-height:1.05; letter-spacing:-.01em}
+  h2{font-family:Georgia,"Times New Roman",serif; font-weight:700; font-size:clamp(28px,3.6vw,44px); line-height:1.1; margin-bottom:18px}
+  h3{font-size:19px; font-weight:700; margin-bottom:8px}
+  p,li{font-size:clamp(16px,1.55vw,21px); line-height:1.45}
+  p{margin-bottom:14px}
+  ul{margin:0 0 14px 22px}
+  li{margin-bottom:8px}
+  .lead{font-size:clamp(19px,2vw,26px); line-height:1.4; max-width:52ch}
+  .small{font-size:14px; color:var(--grey); line-height:1.5}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .rule{border:none;border-top:3px solid var(--ink); margin:18px 0 22px 0; width:100%}
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:4vw; align-items:start}
+  .cols3{display:grid; grid-template-columns:repeat(3,1fr); gap:2.5vw; align-items:start}
+  @media(max-width:900px){.cols,.cols3{grid-template-columns:1fr}}
+  .statgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:18px; margin:20px 0}
+  .stat{border-top:3px solid var(--ink); padding-top:10px}
+  .stat .n{font-family:Georgia,serif; font-size:clamp(30px,3.4vw,46px); font-weight:700; line-height:1}
+  .stat .l{font-size:13.5px; color:var(--grey); margin-top:6px; line-height:1.4}
+  .stat.blue{border-top-color:var(--blue)} .stat.blue .n{color:var(--blue)}
+  .stat.amber{border-top-color:var(--amber)}
+  table{width:100%; border-collapse:collapse; font-size:15.5px; margin:12px 0}
+  th{font-family:ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+     text-align:right; padding:8px 10px; border-bottom:2.5px solid var(--ink); color:var(--ink)}
+  th:first-child{text-align:left}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); text-align:right; font-variant-numeric:tabular-nums}
+  td:first-child{text-align:left; font-weight:600}
+  tr.hl td{background:#eef3fb; font-weight:700}
+  .box{background:var(--soft); padding:18px 20px; margin:14px 0}
+  .box.warn{background:#fdf3e7; border-left:5px solid var(--amber)}
+  .box.stop{background:#fbeeec; border-left:5px solid var(--red)}
+  .box .t{font-weight:700; margin-bottom:6px}
+  .box p:last-child{margin-bottom:0}
+  .wall{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin:16px 0}
+  .wall figure{border:1px solid var(--line); background:#fff}
+  .wall img{width:100%; height:150px; object-fit:cover; display:block}
+  .wall figcaption{font-size:12px; color:var(--grey); padding:7px 9px; font-family:ui-monospace,Menlo,monospace}
+  .card{border:1.5px solid var(--ink); padding:16px 18px; margin-bottom:14px; background:#fff}
+  .card .hd{display:flex; justify-content:space-between; gap:12px; font-family:ui-monospace,Menlo,monospace; font-size:12.5px; color:var(--grey); margin-bottom:8px}
+  .card .ttl{font-weight:700; font-size:17px; margin-bottom:5px}
+  .card .bdy{font-size:15.5px; line-height:1.45}
+  .card .lnk{font-size:13px; color:var(--blue); margin-top:7px; font-family:ui-monospace,Menlo,monospace}
+  svg.chart{width:100%; height:auto; display:block; margin:10px 0}
+  .chartnote{font-size:13.5px; color:var(--grey); margin-top:4px}
+  .hud{
+    position:fixed; left:0; right:0; bottom:0; display:flex; justify-content:space-between; align-items:center;
+    padding:10px 20px; font-family:ui-monospace,Menlo,monospace; font-size:12.5px; color:var(--grey);
+    background:linear-gradient(to top, rgba(255,255,255,.96), rgba(255,255,255,0)); z-index:50; pointer-events:none;
+  }
+  .hud button{pointer-events:auto; font:inherit; background:#fff; border:1.5px solid var(--ink); color:var(--ink);
+    padding:5px 12px; cursor:pointer; margin-left:8px}
+  .hud button:hover{background:var(--ink); color:#fff}
+  #bar{position:fixed; top:0; left:0; height:4px; background:var(--amber); z-index:60; width:0%}
+  .notes{display:none; margin-top:22px; border-top:2px dashed var(--blue); padding-top:14px}
+  body.shownotes .notes{display:block}
+  .notes .t{font-family:ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); margin-bottom:8px}
+  .notes p,.notes li{font-size:15px}
+  .bigq{font-family:Georgia,serif; font-size:clamp(24px,3vw,38px); line-height:1.25; font-style:italic; max-width:26ch}
+  .tag{display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:11.5px; letter-spacing:.08em;
+       border:1.5px solid var(--ink); padding:3px 8px; margin-right:6px; text-transform:uppercase}
+  .tag.b{border-color:var(--blue); color:var(--blue)} .tag.r{border-color:var(--red); color:var(--red)}
+  .flow{display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; margin:16px 0}
+  .flow .step{flex:1 1 150px; border:1.5px solid var(--ink); padding:12px 14px}
+  .flow .step .s{font-family:ui-monospace,Menlo,monospace; font-size:11.5px; color:var(--blue); letter-spacing:.1em; text-transform:uppercase}
+  .flow .step .v{font-weight:700; font-size:16.5px; margin-top:4px}
+  .flow .arr{align-self:center; font-size:22px; font-weight:700}
+  @media print{
+    body{overflow:visible} .deck{height:auto}
+    .slide{display:flex !important; position:static; page-break-after:always; overflow:visible; min-height:95vh}
+    .hud,#bar{display:none} .notes{display:block}
+  }
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div class="deck" id="deck">
+
+<!-- 1 TITLE -->
+<section class="slide">
+  <div class="kicker">APRD 3002 · Traditional Media I · Thu Nov 5, 2026</div>
+  <h1>Out-of-Home:<br>the oldest medium<br>is having a record decade</h1>
+  <hr class="rule">
+  <p class="lead">US out-of-home revenue hit <strong>$9.46 billion in 2025</strong> — an all-time record, up 3.6% — and Q1 2026 grew another 7.1% to $2.12B. Digital screens are the engine: <strong>36.3% of revenue and growing double digits</strong>.</p>
+  <p>Today: what OOH actually is (four format families), how an "impression" works when nobody can click, how programmatic buying changed the oldest buy in media, and where the jobs are. Bring the photo of an ad you physically walked past this week.</p>
+  <p class="small">Sources on the slides: OAAA revenue releases (2025 full year; Q1 2026), Geopath measurement documentation, World Out of Home Organization programmatic study. Every number carries its year — steal that habit.</p>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Frame for the two Traditional classes: only industries that are still robust and hiring — OOH/DOOH today, audio + TV Tuesday. No newspapers/magazines/direct-mail elegies. The planning math (reach, frequency, CPM, GRPs) transfers directly into capstone workshops.</p>
+  </div>
+</section>
+
+<!-- 2 WHY OOH SURVIVED -->
+<section class="slide">
+  <div class="kicker">Why this medium didn't die</div>
+  <h2>Unskippable, unblockable, and suddenly measurable</h2>
+  <div class="cols3">
+    <div class="box"><div class="t">It can't be skipped</div><p>No ad blocker, no skip button, no feed algorithm between the ad and the eyeball. In a class that just spent two months on auction fraud and viewability floors, a 14×48-foot physical object has a certain honesty.</p></div>
+    <div class="box"><div class="t">It digitized without losing itself</div><p>Digital faces rotate creative by hour, weather, or score. DOOH grew <strong>10.5% in 2025</strong> (12.9% in Q1 2026) while static billboards still hold <strong>71.1% of OOH revenue</strong> — both businesses are healthy at once.</p></div>
+    <div class="box"><div class="t">It got a data layer</div><p>Mobile-location measurement (Geopath) plus programmatic pipes (Vistar, Place Exchange/Broadsign, DV360) let planners buy audiences-in-motion instead of renting boards by the month-long handshake.</p></div>
+  </div>
+  <p>The AI-brand detail from OAAA's Q1 2026 release is worth pausing on: the newest companies in tech are buying the oldest medium to look real. Physical presence signals permanence in a way a feed ad never will.</p>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Ask for walked-past examples now; bank 3-4 for the pricing exercise at the end. Contrast with Peter's supply talk: OOH supply is scarce, local, and permitted — the opposite of open-exchange infinity.</p>
+  </div>
+</section>
+
+<!-- 3 FORMAT MAP -->
+<section class="slide">
+  <div class="kicker">The format map</div>
+  <h2>Four families, four different jobs</h2>
+  <table>
+    <tr><th>Family</th><th>What it is</th><th>The job it does</th></tr>
+    <tr><td>Billboards</td><td style="text-align:left">14×48 bulletins, 30-sheet posters, wallscapes; 71.1% of 2025 OOH revenue</td><td style="text-align:left">Mass local reach, launch weight, "we exist here" permanence</td></tr>
+    <tr><td>Street furniture</td><td style="text-align:left">Bus shelters, kiosks, benches, bike-share panels</td><td style="text-align:left">Pedestrian frequency, neighborhood-level presence</td></tr>
+    <tr><td>Transit</td><td style="text-align:left">Bus/rail wraps and interiors, station dominations, airport media</td><td style="text-align:left">Captive dwell time; commuters and travelers with minutes, not seconds</td></tr>
+    <tr><td>Place-based / DOOH screens</td><td style="text-align:left">Grocery, gym, office, bar/restaurant, EV-charging, retail screens</td><td style="text-align:left">Contextual moments near purchase; the programmatic growth layer</td></tr>
+  </table>
+  <p>Owners you'll meet in job postings: <strong>Lamar, OUTFRONT, Clear Channel Outdoor, JCDecaux</strong> — plus hundreds of local independents. Specialized buyers sit inside agencies (OOH teams) and specialist shops; this is a real first job, not a museum tour.</p>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Denver/Boulder texture: RTD transit inventory, I-25/US-36 bulletins, DEN airport media. Students' walked-past photos usually land in street furniture + place-based — use theirs to populate the table live.</p>
+  </div>
+</section>
+
+<!-- 4 IMPRESSION -->
+<section class="slide">
+  <div class="kicker">Measurement · the honest version</div>
+  <h2>What is an "impression" when nobody clicks?</h2>
+  <div class="flow">
+    <div class="step"><div class="s">Movement</div><div class="v">Aggregated mobile-location + traffic counts: who passes, when, which direction</div></div><div class="arr">→</div>
+    <div class="step"><div class="s">Viewshed</div><div class="v">Is the face visible from that path, at that angle, for how long?</div></div><div class="arr">→</div>
+    <div class="step"><div class="s">Likelihood-to-see</div><div class="v">Visibility adjustments turn passings into "eyes-on" impressions</div></div><div class="arr">→</div>
+    <div class="step"><div class="s">Ratings</div><div class="v">Reach, frequency, TRPs by audience segment — Geopath is the currency</div></div>
+  </div>
+  <p><strong>Geopath</strong> (founded 1933 as the Traffic Audit Bureau) is the independent US currency: likelihood-to-see impressions, audience composition, reach/frequency — now built with OAAA into a next-generation platform. Compare honestly with digital: an OOH impression is <em>modeled exposure of a person near a fixed object</em>; a served digital impression is a logged ad call that may never have been seen. Neither is "a person definitely looked." The words are the same; the evidence rituals differ.</p>
+  <div class="box warn"><div class="t">The question to ask any OOH seller</div><p>"Geopath-rated or vendor-modeled? In-market impressions or total passings? Audience segment or all persons 18+?" Three questions, same discipline as your Subaru reconciliation — denominators before dollars.</p></div>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Tie to Reporting class: OTS (opportunity-to-see) vs LTS (likelihood-to-see) is OOH's version of attribution windows — a modeling choice with billing attached. GRP math: 1 rating point = in-market impressions equal to 1% of market population.</p>
+  </div>
+</section>
+
+<!-- 5 MATH -->
+<section class="slide">
+  <div class="kicker">Planning math</div>
+  <h2>Reach, frequency, GRPs — the original media math</h2>
+  <div class="cols">
+    <div>
+      <table>
+        <tr><th>Term</th><th>Definition</th></tr>
+        <tr><td>Impressions</td><td style="text-align:left">Likelihood-to-see contacts in the flight</td></tr>
+        <tr><td>Reach %</td><td style="text-align:left">Share of market population exposed ≥1×</td></tr>
+        <tr><td>Frequency</td><td style="text-align:left">Average exposures per reached person</td></tr>
+        <tr><td>GRPs / TRPs</td><td style="text-align:left">Reach % × Frequency (TRP = target audience)</td></tr>
+        <tr><td>CPM</td><td style="text-align:left">Cost ÷ impressions × 1,000 — same formula as Subaru, softer denominator</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>A worked skeleton (illustrative)</h3>
+      <p>Denver DMA adults ≈ 2.5M. A 4-week bulletin package delivering 12.5M in-market impressions = <strong>500 GRPs</strong>. At 55% reach, average frequency ≈ 9. If the package costs $60K, CPM ≈ <strong>$4.80</strong> — cheaper than most of the Subaru display you just reported, for a format nobody can skip.</p>
+      <div class="box"><div class="t">Why planners still teach this</div><p>Reach curves saturate: the second 500 GRPs buy mostly frequency, not new people (your Travel Pony saturation lesson, wearing a billboard). Every medium in your capstone plan must declare which side of that curve it's buying.</p></div>
+    </div>
+  </div>
+  <p class="small">Illustrative numbers for method, labeled as such — Geopath ratings for a real buy come from the planning system, not a slide.</p>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Do the math live on one student photo example: guess market, format, plausible weekly impressions, price the CPM range. Keep ranges honest (local bulletin 4-week rates vary wildly by market/corridor).</p>
+  </div>
+</section>
+
+<!-- 6 PROGRAMMATIC DOOH -->
+<section class="slide">
+  <div class="kicker">The buy, modernized</div>
+  <h2>Programmatic DOOH: small share, steep curve, real pipes</h2>
+  <ul>
+    <li><strong>Global programmatic DOOH was $1.339B in 2025 — just ~7% of digital OOH</strong> (World Out of Home Organization). Most DOOH still trades direct/reserved; programmatic is the growth layer, not yet the default.</li>
+    <li><strong>2025 consolidation:</strong> T-Mobile acquired <strong>Vistar Media</strong> (DOOH DSP/SSP); <strong>Broadsign acquired Place Exchange</strong> (Nov 2025); Place Exchange then launched <strong>Programmatic Guaranteed inside Google DV360</strong> (Dec 2025) — OOH now sits inside the same DSPs as your Trade Desk lecture.</li>
+    <li><strong>What programmatic actually buys here:</strong> dayparted, weather/score-triggered, audience-indexed screen time — one-to-many impressions priced per play, not per person. No cookies, no device graph of individuals; think "context + movement," the Peer39 lesson at street scale.</li>
+  </ul>
+  <div class="box"><div class="t">Peter's world, meet the billboard</div><p>Connected Partnerships (Peter's desk) is exactly where curated DOOH deals live: premium screen networks, guaranteed placements, measurement add-ons. Ask in your plans: open auction, PMP, or guaranteed — and what each does to price and proof.</p></div>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Caveat the 7%: global figure, US programmatic share runs higher in place-based networks. Attribution add-ons (footfall, site-lift panels) inherit all the Reporting-class caveats — modeled lift is not sales.</p>
+  </div>
+</section>
+
+<!-- 7 CREATIVE -->
+<section class="slide">
+  <div class="kicker">Creative discipline</div>
+  <h2>Three seconds. Seven words. One idea.</h2>
+  <div class="cols">
+    <div>
+      <h3>The constraints are the craft</h3>
+      <ul>
+        <li>Glance media: drivers get ~3 seconds; pedestrians get more, transit riders get minutes. Design for the worst viewer, reward the best.</li>
+        <li>One product, one promise, huge type, brutal contrast. If it needs a paragraph, it's a poster for a hallway, not a highway.</li>
+        <li>DOOH motion is seasoning: subtle motion wins attention; full-video thinking imported from CTV usually fails at 45 mph.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Test it like a planner</h3>
+      <ul>
+        <li>Thumbnail test: legible at postage-stamp size, in grayscale, in rain glare?</li>
+        <li>Distance test: brand identifiable before the headline resolves?</li>
+        <li>Context test: does the location complete the joke/claim (airport, gym, grocery)? Place-based creative that ignores place wastes the premium.</li>
+      </ul>
+      <div class="box warn"><div class="t">In class (10 minutes)</div><p>Grade your walked-past photo: words counted, idea in one sentence, brand at distance, one rewrite that cuts half the copy. Best rewrite gets defended out loud.</p></div>
+    </div>
+  </div>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>This exercise is the day's participation artifact; feeds capstone creative sections. Award the room's harshest (fair) edit.</p>
+  </div>
+</section>
+
+<!-- 8 PLANNING ROLE -->
+<section class="slide">
+  <div class="kicker">Where OOH earns its line</div>
+  <h2>Four jobs OOH does better than your feed</h2>
+  <div class="cols">
+    <ul>
+      <li><strong>Local presence at scale:</strong> launch in a city, defend a home market, surround retail locations within their trade areas.</li>
+      <li><strong>Always-on fame:</strong> the same faces on the same commute build memory through pure repeated geography — frequency without auction volatility.</li>
+    </ul>
+    <ul>
+      <li><strong>Moment/context triggers (DOOH):</strong> weather, scores, dayparts, countdowns — creative that reacts to the street it's standing on.</li>
+      <li><strong>Trust/permanence signal:</strong> startups and AI brands buy physical weight precisely because feeds feel disposable (OAAA called out AI-brand demand in Q1 2026 growth).</li>
+    </ul>
+  </div>
+  <div class="box warn"><div class="t">And its limits, plainly</div><p>No click, no individual targeting, no last-touch story. Effectiveness evidence is lift-style (exposed-market vs. control, footfall/search panels) — which means your capstone KPI section must design the comparison, not quote a CTR that doesn't exist.</p></div>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Connect to incrementality lecture: OOH forces geo-experiment thinking earlier than digital does. Good capstone move: one exposed DMA vs. matched holdout, judged on search/store signals with windows named.</p>
+  </div>
+</section>
+
+<!-- 9 BUYING REALITY -->
+<section class="slide">
+  <div class="kicker">How the buy actually happens</div>
+  <h2>Permits, scarcity, and the 4-week flight</h2>
+  <ul>
+    <li><strong>Inventory is physical and finite:</strong> a bulletin exists once, on one corridor, under local sign codes. Prime faces sell out; there is no "more impressions" button — there are other faces.</li>
+    <li><strong>Flighting unit is typically 4 weeks</strong> for static; DOOH sells share-of-voice rotations (e.g., 1 of 6–10 slots in a loop) down to dayparts programmatically.</li>
+    <li><strong>Production is real:</strong> vinyl printing/install for static (budget it, schedule it), spec-per-network files for DOOH. Proof-of-posting photos are the delivery receipt — the analog ancestor of your screenshot evidence rules.</li>
+    <li><strong>Local rules rule:</strong> sign codes, scenic/byway restrictions, alcohol/cannabis proximity rules, and election-season demand spikes all price into availability.</li>
+  </ul>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Students love that posting crews photograph every installation — proof-of-performance predates ad verification by a century. Ask: what would proof-of-posting look like for a programmatic screen buy? (Play logs + screen health + photo audits.)</p>
+  </div>
+</section>
+
+<!-- 10 JOBS -->
+<section class="slide">
+  <div class="kicker">Careers</div>
+  <h2>Where the OOH jobs actually sit</h2>
+  <table>
+    <tr><th>Seat</th><th>Who hires</th><th>What you'd do first</th></tr>
+    <tr><td>Media owner sales/planning</td><td style="text-align:left">Lamar, OUTFRONT, Clear Channel, JCDecaux, local independents</td><td style="text-align:left">Build proposals from Geopath ratings; ride along on market tours; learn every face in your territory</td></tr>
+    <tr><td>Agency OOH buyer/planner</td><td style="text-align:left">Holding-company OOH teams + specialist shops</td><td style="text-align:left">Market lists, reach/frequency plans, posting verification, DOOH trafficking</td></tr>
+    <tr><td>Programmatic DOOH</td><td style="text-align:left">Vistar (T-Mobile), Broadsign/Place Exchange, VIOOH, DSP OOH desks</td><td style="text-align:left">Campaign setup, audience/movement targeting, screen-network QA — Peter-adjacent skills</td></tr>
+    <tr><td>Measurement</td><td style="text-align:left">Geopath ecosystem, owner insights teams</td><td style="text-align:left">Audience delivery reports, lift-study support, ratings QA</td></tr>
+  </table>
+  <p>Denver is a real OOH market (DEN, RTD, I-25 corridor). The interview flex from this class: you can already talk Geopath denominators, GRP math, and proof-of-posting — most applicants can only say "billboards."</p>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Encourage checking Lamar/OUTFRONT early-career postings live in class if energy allows. Skills overlap with Edge/programmatic lectures is the selling point for DOOH roles.</p>
+  </div>
+</section>
+
+<!-- 11 CAPSTONE TRANSFER -->
+<section class="slide">
+  <div class="kicker">Into your media plan</div>
+  <h2>If OOH is in your capstone, it needs four lines</h2>
+  <div class="flow">
+    <div class="step"><div class="s">Job</div><div class="v">Which of the four jobs (presence / fame / moment / trust)?</div></div><div class="arr">→</div>
+    <div class="step"><div class="s">Math</div><div class="v">Markets, faces/screens, flight weeks, GRPs, reach/frequency, CPM — denominators named</div></div><div class="arr">→</div>
+    <div class="step"><div class="s">Creative</div><div class="v">7-word proof it works at speed + distance test</div></div><div class="arr">→</div>
+    <div class="step"><div class="s">Evidence</div><div class="v">Geo comparison or lift design — no CTR fairy tales</div></div>
+  </div>
+  <p>Next class (Tuesday): Traditional II — audio and television, where ratings were born and political money still floods local markets every cycle. Your Campaign Reporting report is due Thursday 11/12; the same denominator discipline applies.</p>
+  <div class="notes"><div class="t">Speaker notes</div>
+    <p>Close by collecting the best creative rewrite + one "my photo, priced" volunteer. Preview Trad II question: if OOH impressions are modeled, wait until they meet a Nielsen diary.</p>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<div class="hud">
+  <span>Traditional I: OOH · APRD 3002 · <span id="counter">1 / 11</span></span>
+  <span>
+    <button id="prevBtn" type="button">← Prev</button>
+    <button id="nextBtn" type="button">Next →</button>
+    <button id="notesBtn" type="button">Notes (N)</button>
+    <button id="fsBtn" type="button">Fullscreen (F)</button>
+  </span>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll(".slide")]; let cur=0;
+function show(i){
+  cur=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,j)=>s.classList.toggle("active", j===cur));
+  document.getElementById("counter").textContent=(cur+1)+" / "+slides.length;
+  document.getElementById("bar").style.width=((cur+1)/slides.length*100)+"%";
+  slides[cur].scrollTop=0;
+  history.replaceState(null,"","#"+(cur+1));
+}
+document.getElementById("prevBtn").onclick=()=>show(cur-1);
+document.getElementById("nextBtn").onclick=()=>show(cur+1);
+document.getElementById("notesBtn").onclick=()=>document.body.classList.toggle("shownotes");
+document.getElementById("fsBtn").onclick=()=>{
+  if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
+};
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();show(cur+1);}
+  else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();show(cur-1);}
+  else if(e.key==="n"||e.key==="N") document.body.classList.toggle("shownotes");
+  else if(e.key==="f"||e.key==="F") document.getElementById("fsBtn").click();
+  else if(e.key==="Home") show(0); else if(e.key==="End") show(slides.length-1);
+});
+let tx=null;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+document.addEventListener("touchend",e=>{
+  if(tx===null) return; const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>60) show(cur+(dx<0?1:-1)); tx=null;
+},{passive:true});
+show(Math.min(slides.length-1, Math.max(0, (parseInt(location.hash.slice(1))||1)-1)));
+</script>
+</body>
+</html>
+
+
